@@ -1,0 +1,34 @@
+{% extends "index.html" %} {% block catalogcontent %}
+<h1>Add Item</h1>
+<hr>
+<form class="form-horizontal" method="post">
+    <div class="form-group">
+        <label for="ItemName" class="col-md-2 control-label">Item Name</label>
+        <div class="col-md-8">
+            <input type="text" class="form-control" id="ItemName" placeholder="Enter Item Name" name="ItemName">
+        </div>
+    </div>
+    <div class="form-group">
+        <label for="ItemDesc" class="col-md-2 control-label">Description</label>
+        <div class="col-md-8">
+            <textarea type="text" class="form-control" cols="60" rows="5" id="ItemDesc" placeholder="description" name="ItemDesc">
+
+                </textarea>
+        </div>
+    </div>
+    <div class="form-group">
+        <label for="ItemCat" class="col-md-2 control-label">Category</label>
+        <select name="ItemCat" id="ItemCat">
+                {% for item in catalog %} 
+                <option value="{{item.cat_id}}">{{item.cat_name}}</option>
+                {% endfor %} 
+        </select>
+    </div>
+    <div class="form-group">
+            <div class="col-md-offset-2 col-md-8">
+                <button type="submit" class="btn btn-default">Submit</button>
+                <a href="/catalog" id="cancel" name="cancel" class="btn btn-default">Cancel</a>
+            </div>
+        </div>
+</form>
+{% endblock %}

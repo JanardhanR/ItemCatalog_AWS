@@ -1,0 +1,14 @@
+{% extends "index.html" %} {% block catalogcontent %}
+<br>
+<div class="row col-md-offset-2 ">
+    <div class="col-md-3 ">
+        {% for item in catalog %}
+        <a href="{{url_for('CatalogItemsHander',catagoryname=item.cat_name)}}">{{item.cat_name}}</a>
+        <br> {% endfor %}
+    </div>    
+    <div class="col-md-4 "><h4>{{category}}</h4>{% for catitem in catalogitems %}
+        <a id="iteminfo" href='{{url_for('ShowItemHander',catagoryname=catitem.catalog.cat_name,itemid=catitem.item_id)}}'>{{catitem.item_name}}</a>
+        <br>{% endfor %}
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Item Catalog</title>
+    <link href="/static/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://apis.google.com/js/client:platform.js?onload=onLoadCallback" async defer></script>
+    <script>
+        window.onLoadCallback = function start() {
+            gapi.load('auth2', function () {
+                auth2 = gapi.auth2.init({
+                    client_id: '881696968556-n97fd1qv9f8hmtbvf2kdc0784ofokrbk.apps.googleusercontent.com',
+                    // Scopes to request in addition to 'profile' and 'email'
+                    //scope: 'additional_scope'
+                });
+            });
+        }
+    </script>
+</head>
+
+<body>
+    <header>
+        <nav class="navbar navbar-default">
+            <div class="container-fluid">
+                <!-- Brand and toggle get grouped for better mobile display -->
+                <div class="navbar-header">
+                    <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1"
+                        aria-expanded="false">
+                          <span class="sr-only">Toggle navigation</span>
+                          <span class="icon-bar"></span>
+                          <span class="icon-bar"></span>
+                          <span class="icon-bar"></span>
+                        </button>
+                    <a class="navbar-brand" href="#"><span style=" font-size:26px;
+                            color: darkblue;font-family: 'Pacifico', cursive;"> Catalog App </span></a>
+                </div>
+
+                <!-- Collect the nav links, forms, and other content for toggling -->
+                <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+                    <ul class="nav navbar-nav navbar-right">
+                        <li><a href="{{url_for('CatalogHander')}}">Home</a></li>
+                        {% if 'username' not in session %}
+                        <li><a id="signinButton" href="#">Login</a></li>
+                        {% else %}
+                        <li><a id="signOutButton">Logout</a></li>
+                        {% endif %}
+                    </ul>
+                </div>
+                <!-- /.navbar-collapse -->
+            </div>
+            <!-- /.container-fluid -->
+        </nav>    
+
+    </header>
+        {% block catalogcontent %} {% endblock %} {% block catalogscript %} {% endblock %}
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+    <script src="/static/js/bootstrap.min.js"></script>
+    <script>
+        $('#signinButton').click(function () {
+            auth2.grantOfflineAccess().then(signInCallback);
+        });
+
+        $('#signOutButton').click(function () {
+            auth2.disconnect().then(revokeCallback);
+        });
+    </script>
+    <script>
+        function signInCallback(authResult) {
+            if (authResult['code']) {
+                // Send the code to the server
+                // $('#signinButton').attr('style', 'display: None');
+
+                $.ajax({
+                    type: 'POST',
+                    url: '/gconnect?state={{session["state"]}}',
+                    // Always include an `X-Requested-With` header in every AJAX request,
+                    // to protect against CSRF attacks.
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest'
+                    },
+                    contentType: 'application/octet-stream; charset=utf-8',
+                    success: function (result) {
+                        if (result) {
+                            //just show signout button now, dont redirect yet till
+                            //signin/signout templates are created..
+                            // Hide the sign-in button now that the user is authorized, for example:
+
+                            // $('#signOutButton').attr('style', 'display:inline-flex');
+                            setTimeout(function () {
+                                window.location.href = "/catalog";
+                            }, 1000);
+                        }
+                    },
+                    error: function () {
+                        console.log("gconnect failed");
+                    },
+                    processData: false,
+                    data: authResult['code']
+                });
+
+
+            } else {
+                console.log("in callback auth code not received");
+            }
+        }
+
+        function revokeCallback() {
+            // Send the code to the server
+            $.ajax({
+                type: 'GET',
+                url: '/gdisconnect',
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest'
+                },
+                contentType: 'application/octet-stream; charset=utf-8',
+                success: function (result) {
+                    if (result) {
+                        console.log(result)
+                        setTimeout(function () {
+                            window.location.href = "/catalog";
+                        }, 1000);
+                    }
+                },
+                error: function () {
+                    console.log("gDisconnect failed");
+                },
+                processData: false
+            });
+        }
+    </script>
+    <script type=text/javascript>
+        $SCRIPT_ROOT = {{ request.script_root|tojson|safe }};
+    </script>
+    {%block catscriptblock %}
+    {% endblock %}
+</body>
+
+</html>

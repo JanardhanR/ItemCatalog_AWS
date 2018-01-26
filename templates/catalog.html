@@ -1,0 +1,23 @@
+{% extends "index.html" %} {% block catalogcontent %}
+<br>
+<div class="row col-md-offset-2 ">
+    <div class="col-md-3 ">
+        {% for item in catalog %}
+        <a href="{{url_for('CatalogItemsHander',catagoryname=item.cat_name)}}">{{item.cat_name}}</a>
+        <br> {% endfor %}
+    </div>
+    <div class="col-md-4 ">
+        {% if 'username' not in session %} {% else %}
+        <a href="{{url_for('AddItemHandler')}}">Add Item</a>
+        <br> 
+        {% endif %}
+        <h3>Latest Items</h3>
+        {% for catitem in catalogitems %}
+        <a href='{{url_for('ShowItemHander',catagoryname=catitem.catalog.cat_name,itemid=catitem.item_id)}}'>{{catitem.item_name}}
+            <span>({{catitem.catalog.cat_name}})</span>
+        </a>
+        <br>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}
